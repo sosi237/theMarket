@@ -27,18 +27,18 @@ public class OrderProduct  implements Serializable{
         @Serial
         private static final long serialVersionUID = 3142417894931649554L;
 
-        @Column(name = "ordSn", nullable = false)
+        @Column(name = "ord_sn", nullable = false)
         private Long ordSn;
 
-        @Column(name = "ordPrdTurn", nullable = false)
+        @Column(name = "ord_prd_turn", nullable = false)
         private Long ordPrdTurn;
 
     }
 
-    @Column(name = "ordPrdNm", nullable = false)
+    @Column(name = "ord_prd_nm", nullable = false)
     private String ordPrdNm;
 
-    @Column(name = "ordPrdPrc", nullable = false)
+    @Column(name = "ord_prd_prc", nullable = false)
     private Integer ordPrdPrc;
 
 }

@@ -21,16 +21,16 @@ public class Product  implements Serializable {
     private static final long serialVersionUID = 2806329010529758266L;
 
     @Id
-    @Column(name = "prdNo", nullable = false)
+    @Column(name = "prd_no", nullable = false)
     private String prdNo;
 
-    @Column(name = "prdNm", nullable = false)
+    @Column(name = "prd_nm", nullable = false)
     private String prdNm;
 
-    @Column(name = "prdPrc", nullable = false)
+    @Column(name = "prd_prc", nullable = false)
     private Integer prdPrc;
 
-    @Column(name = "prdStock", nullable = false)
+    @Column(name = "prd_stock", nullable = false)
     private Integer prdStock;
 
 }

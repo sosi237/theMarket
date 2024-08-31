@@ -21,13 +21,13 @@ public class Order implements Serializable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "ordSn", nullable = false)
+    @Column(name = "ord_sn", nullable = false)
     private Long ordSn;
 
-    @Column(name="regDt")
+    @Column(name="reg_dt")
     private LocalDateTime regDt;
 
     @OneToMany
-    @JoinColumn(name="ordSn", referencedColumnName = "ordSn")
+    @JoinColumn(name="ord_sn", referencedColumnName = "ord_sn")
     private List<OrderProduct> orderProducts;
 }
