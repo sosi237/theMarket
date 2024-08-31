@@ -41,4 +41,7 @@ public class OrderProduct  implements Serializable{
     @Column(name = "ord_prd_prc", nullable = false)
     private Integer ordPrdPrc;
 
+    @Column(name = "ord_prd_qty", nullable = false)
+    private Integer ordPrdQty;
+
 }
