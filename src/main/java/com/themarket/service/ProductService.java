@@ -11,9 +11,10 @@ import com.themarket.repository.ProductRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
+import org.springframework.util.ObjectUtils;
 import org.springframework.util.StringUtils;
 
-import java.util.Optional;
+import java.util.*;
 
 @Slf4j
 @RequiredArgsConstructor
@@ -41,35 +42,36 @@ public class ProductService {
     }
 
     public ResponseDTO decreaseStock(ProductStockDecreaseRequestDTO productStockDecreaseRequestDTO) {
-        final String prdNo = productStockDecreaseRequestDTO.getPrdNo();
-        final int decreaseQty = productStockDecreaseRequestDTO.getDecreaseQty();
+        List<String> prdNos = new ArrayList<>();
+        Map<String, Integer> qtyMap = new HashMap<>();
 
-        try {
-            if (!StringUtils.hasText(prdNo) || decreaseQty <= 0) {
+        for(ProductStockDecreaseRequestDTO.Product product : productStockDecreaseRequestDTO.getProducts()){
+
+            if (!StringUtils.hasText(product.getPrdNo()) || product.getDecreaseQty() <= 0) {
                 throw new ValidationException("상품번호 혹은 차감개수가 잘못되었습니다.");
             }
 
-            Optional<Product> optionalProduct = productRepository.findById(prdNo);
-            if (!optionalProduct.isPresent()) {
-                throw new ResourceNotFoundException("해당 상품번호와 일치하는 정보가 없습니다: " + prdNo);
+            prdNos.add(product.getPrdNo());
+            qtyMap.put(product.getPrdNo(), product.getDecreaseQty());
+        }
+
+        // 상품 목록 조회
+        List<Product> products = productRepository.findAllById(prdNos);
+
+        if (!ObjectUtils.isEmpty(products)){
+
+            for(Product product : products){
+                int decreaseQty = qtyMap.get(product.getPrdNo());
+
+                if (product.getPrdStock() < decreaseQty) {
+                    throw new ValidationException("재고가 부족합니다. 차감할 수 없습니다: " + product.getPrdNo());
+                }
+
+                // 재고 차감처리
+                productRepository.save(product.toBuilder()
+                        .prdStock(product.getPrdStock() - decreaseQty)
+                        .build());
             }
-
-            Product product = optionalProduct.get();
-
-            if (product.getPrdStock() < decreaseQty) {
-                throw new ValidationException("재고가 부족합니다. 차감할 수 없습니다: " + prdNo);
-            }
-
-            // 재고 차감처리
-            productRepository.save(product.toBuilder()
-                    .prdStock(product.getPrdStock() - decreaseQty)
-                    .build());
-
-        } catch (Exception e) {
-            return ResponseDTO.builder()
-                    .code(BaseEnum.Fail.getCode())
-                    .message(e.getMessage())
-                    .build();
         }
 
         return ResponseDTO.builder()

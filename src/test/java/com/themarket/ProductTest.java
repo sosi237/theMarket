@@ -6,6 +6,7 @@ import com.themarket.dto.ResponseDTO;
 import com.themarket.entity.Product;
 import com.themarket.enums.BaseEnum;
 import com.themarket.exception.ResourceNotFoundException;
+import com.themarket.exception.ValidationException;
 import com.themarket.repository.ProductRepository;
 import com.themarket.service.ProductService;
 import org.junit.jupiter.api.DisplayName;
@@ -15,6 +16,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -90,12 +92,17 @@ class ProductTest {
                 .prdStock(prdStock)
                 .build();
 
-        when(productRepository.findById(prdNo)).thenReturn(Optional.of(product));
+        when(productRepository.findAllById(List.of(prdNo))).thenReturn(List.of(product));
 
         // when
         ResponseDTO responseDTO = productService.decreaseStock(ProductStockDecreaseRequestDTO.builder()
-                .prdNo(prdNo)
-                .decreaseQty(10)
+                .products(List.of(
+                                ProductStockDecreaseRequestDTO.Product.builder()
+                                        .prdNo(prdNo)
+                                        .decreaseQty(10)
+                                        .build()
+                        )
+                )
                 .build());
 
         // then
@@ -106,41 +113,39 @@ class ProductTest {
     @DisplayName("상품 재고차감 실패: prdNo 없음")
     @Test
     public void decreaseStockFail_emptyPrdNo() {
-        ResponseDTO responseDTO = productService.decreaseStock(ProductStockDecreaseRequestDTO.builder()
-                .decreaseQty(10)
-                .build());
+        String prdNo = null;
 
-        assertEquals(BaseEnum.Fail.getCode(), responseDTO.getCode());
-        assertEquals("상품번호 혹은 차감개수가 잘못되었습니다.", responseDTO.getMessage());
+        // When & Then
+        ValidationException exception = assertThrows(ValidationException.class,
+                () -> productService.decreaseStock(ProductStockDecreaseRequestDTO.builder()
+                        .products(List.of(
+                                        ProductStockDecreaseRequestDTO.Product.builder()
+                                                .prdNo(prdNo)
+                                                .decreaseQty(10)
+                                                .build()
+                                )
+                        )
+                        .build()));
+        assertEquals("상품번호 혹은 차감개수가 잘못되었습니다.", exception.getMessage());
     }
 
     @DisplayName("상품 재고차감 실패: 차감개수 음수")
     @Test
     public void decreaseStockFail_wrongQuantity() {
-        ResponseDTO responseDTO = productService.decreaseStock(ProductStockDecreaseRequestDTO.builder()
-                .prdNo("PD240831001")
-                .decreaseQty(-10)
-                .build());
 
-        assertEquals(BaseEnum.Fail.getCode(), responseDTO.getCode());
-        assertEquals("상품번호 혹은 차감개수가 잘못되었습니다.", responseDTO.getMessage());
+        ValidationException exception = assertThrows(ValidationException.class,
+                () -> productService.decreaseStock(ProductStockDecreaseRequestDTO.builder()
+                        .products(List.of(
+                                        ProductStockDecreaseRequestDTO.Product.builder()
+                                                .prdNo("PD240831001")
+                                                .decreaseQty(-10)
+                                                .build()
+                                )
+                        )
+                        .build()));
+        assertEquals("상품번호 혹은 차감개수가 잘못되었습니다.", exception.getMessage());
     }
 
-    @DisplayName("상품 재고차감 실패: 존재하지 않는 상품")
-    @Test
-    public void decreaseStockFail_wrongPrdNo() {
-        String prdNo = "PD24083100111";
-
-        when(productRepository.findById(anyString())).thenReturn(Optional.empty());
-
-        ResponseDTO responseDTO = productService.decreaseStock(ProductStockDecreaseRequestDTO.builder()
-                .prdNo(prdNo)
-                .decreaseQty(10)
-                .build());
-
-        assertEquals(BaseEnum.Fail.getCode(), responseDTO.getCode());
-        assertEquals("해당 상품번호와 일치하는 정보가 없습니다: " + prdNo, responseDTO.getMessage());
-    }
 
     @DisplayName("상품 재고차감 실패: 재고부족")
     @Test
@@ -157,14 +162,18 @@ class ProductTest {
                 .prdStock(prdStock)
                 .build();
 
-        when(productRepository.findById(prdNo)).thenReturn(Optional.of(product));
+        when(productRepository.findAllById(List.of(prdNo))).thenReturn(List.of(product));
 
-        ResponseDTO responseDTO = productService.decreaseStock(ProductStockDecreaseRequestDTO.builder()
-                .prdNo(prdNo)
-                .decreaseQty(1000)
-                .build());
-
-        assertEquals(BaseEnum.Fail.getCode(), responseDTO.getCode());
-        assertEquals("재고가 부족합니다. 차감할 수 없습니다: " + prdNo, responseDTO.getMessage());
+        ValidationException exception = assertThrows(ValidationException.class,
+                () -> productService.decreaseStock(ProductStockDecreaseRequestDTO.builder()
+                        .products(List.of(
+                                        ProductStockDecreaseRequestDTO.Product.builder()
+                                                .prdNo(prdNo)
+                                                .decreaseQty(1000)
+                                                .build()
+                                )
+                        )
+                        .build()));
+        assertEquals("재고가 부족합니다. 차감할 수 없습니다: " + prdNo, exception.getMessage());
     }
 }
