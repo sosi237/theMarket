@@ -92,17 +92,12 @@ class ProductTest {
                 .prdStock(prdStock)
                 .build();
 
-        when(productRepository.findAllById(List.of(prdNo))).thenReturn(List.of(product));
+        when(productRepository.findById(prdNo)).thenReturn(Optional.of(product));
 
         // when
         ResponseDTO responseDTO = productService.decreaseStock(ProductStockDecreaseRequestDTO.builder()
-                .products(List.of(
-                                ProductStockDecreaseRequestDTO.Product.builder()
-                                        .prdNo(prdNo)
-                                        .decreaseQty(10)
-                                        .build()
-                        )
-                )
+                .prdNo(prdNo)
+                .decreaseQty(10)
                 .build());
 
         // then
@@ -118,13 +113,8 @@ class ProductTest {
         // When & Then
         ValidationException exception = assertThrows(ValidationException.class,
                 () -> productService.decreaseStock(ProductStockDecreaseRequestDTO.builder()
-                        .products(List.of(
-                                        ProductStockDecreaseRequestDTO.Product.builder()
-                                                .prdNo(prdNo)
-                                                .decreaseQty(10)
-                                                .build()
-                                )
-                        )
+                        .prdNo(prdNo)
+                        .decreaseQty(10)
                         .build()));
         assertEquals("상품번호 혹은 차감개수가 잘못되었습니다.", exception.getMessage());
     }
@@ -135,13 +125,8 @@ class ProductTest {
 
         ValidationException exception = assertThrows(ValidationException.class,
                 () -> productService.decreaseStock(ProductStockDecreaseRequestDTO.builder()
-                        .products(List.of(
-                                        ProductStockDecreaseRequestDTO.Product.builder()
-                                                .prdNo("PD240831001")
-                                                .decreaseQty(-10)
-                                                .build()
-                                )
-                        )
+                        .prdNo("PD240831001")
+                        .decreaseQty(-10)
                         .build()));
         assertEquals("상품번호 혹은 차감개수가 잘못되었습니다.", exception.getMessage());
     }
@@ -162,17 +147,12 @@ class ProductTest {
                 .prdStock(prdStock)
                 .build();
 
-        when(productRepository.findAllById(List.of(prdNo))).thenReturn(List.of(product));
+        when(productRepository.findById(prdNo)).thenReturn(Optional.of(product));
 
         ValidationException exception = assertThrows(ValidationException.class,
                 () -> productService.decreaseStock(ProductStockDecreaseRequestDTO.builder()
-                        .products(List.of(
-                                        ProductStockDecreaseRequestDTO.Product.builder()
-                                                .prdNo(prdNo)
-                                                .decreaseQty(1000)
-                                                .build()
-                                )
-                        )
+                                .prdNo(prdNo)
+                                .decreaseQty(1000)
                         .build()));
         assertEquals("재고가 부족합니다. 차감할 수 없습니다: " + prdNo, exception.getMessage());
     }
