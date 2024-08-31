@@ -1,4 +1,4 @@
-package com.themarket.entities;
+package com.themarket.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
