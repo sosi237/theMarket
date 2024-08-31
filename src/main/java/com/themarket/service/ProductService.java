@@ -8,6 +8,7 @@ import com.themarket.enums.BaseEnum;
 import com.themarket.exception.ResourceNotFoundException;
 import com.themarket.exception.ValidationException;
 import com.themarket.repository.ProductRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
@@ -18,6 +19,7 @@ import java.util.Optional;
 @Slf4j
 @RequiredArgsConstructor
 @Service
+@Transactional
 public class ProductService {
     private final ProductRepository productRepository;
 
@@ -26,7 +28,7 @@ public class ProductService {
         // 상품정보 조회
         Optional<Product> optionalProduct = productRepository.findById(prdNo);
 
-        if (!optionalProduct.isPresent()) {
+        if (optionalProduct.isEmpty()) {
             throw new ResourceNotFoundException("해당 상품번호와 일치하는 정보가 없습니다: " + prdNo);
         }
 
@@ -40,7 +42,7 @@ public class ProductService {
                 .build();
     }
 
-    public ResponseDTO decreaseStock(ProductStockDecreaseRequestDTO productStockDecreaseRequestDTO) {
+    public void decreaseStock(ProductStockDecreaseRequestDTO productStockDecreaseRequestDTO) {
         final String prdNo = productStockDecreaseRequestDTO.getPrdNo();
         final int decreaseQty = productStockDecreaseRequestDTO.getDecreaseQty();
 
@@ -49,13 +51,15 @@ public class ProductService {
         }
 
         Optional<Product> optionalProduct = productRepository.findById(prdNo);
-        if (!optionalProduct.isPresent()) {
+        if (optionalProduct.isEmpty()) {
             throw new ResourceNotFoundException("해당 상품번호와 일치하는 정보가 없습니다: " + prdNo);
         }
 
         Product product = optionalProduct.get();
 
-        if (product.getPrdStock() < decreaseQty) {
+        boolean hasEnoughStock = this.hasEnoughStock(prdNo, decreaseQty);
+
+        if (!hasEnoughStock) {
             throw new ValidationException("재고가 부족합니다. 차감할 수 없습니다: " + prdNo);
         }
 
@@ -64,9 +68,17 @@ public class ProductService {
                 .prdStock(product.getPrdStock() - decreaseQty)
                 .build());
 
-        return ResponseDTO.builder()
-                .code(BaseEnum.Success.getCode())
-                .message(BaseEnum.Success.getDescription())
-                .build();
+    }
+
+    public boolean hasEnoughStock(String prdNo, int quantity) {
+
+        Optional<Product> optionalProduct = productRepository.findById(prdNo);
+        if (optionalProduct.isEmpty()) {
+            throw new ResourceNotFoundException("해당 상품번호와 일치하는 정보가 없습니다: " + prdNo);
+        }
+
+        Product product = optionalProduct.get();
+
+        return product.getPrdStock() >= quantity;
     }
 }

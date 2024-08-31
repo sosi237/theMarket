@@ -22,7 +22,9 @@ public class OrderProduct  implements Serializable{
 
     @Embeddable
     @NoArgsConstructor
-    public class OrderProductId implements Serializable {
+    @AllArgsConstructor
+    @Builder(toBuilder = true)
+    public static class OrderProductId implements Serializable {
 
         @Serial
         private static final long serialVersionUID = 3142417894931649554L;
@@ -34,6 +36,9 @@ public class OrderProduct  implements Serializable{
         private Long ordPrdTurn;
 
     }
+
+    @Column(name = "prd_no", nullable = false)
+    private String prdNo;
 
     @Column(name = "ord_prd_nm", nullable = false)
     private String ordPrdNm;

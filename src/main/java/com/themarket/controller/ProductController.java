@@ -3,6 +3,7 @@ package com.themarket.controller;
 import com.themarket.dto.ProductResponseDTO;
 import com.themarket.dto.ProductStockDecreaseRequestDTO;
 import com.themarket.dto.ResponseDTO;
+import com.themarket.enums.BaseEnum;
 import com.themarket.service.ProductService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -25,10 +26,15 @@ public class ProductController {
         return ResponseEntity.ok().body(result);
     }
 
-    @Operation(summary = "상품 재고차감 조회", description = "상품재고를 차감한다")
+    @Operation(summary = "상품 재고차감", description = "상품재고를 차감한다")
     @PostMapping(value = "/stock/decrease")
     public ResponseEntity<ResponseDTO> decreaseStock(@RequestBody ProductStockDecreaseRequestDTO productStockDecreaseRequestDTO) {
-        ResponseDTO result = productService.decreaseStock(productStockDecreaseRequestDTO);
-        return ResponseEntity.ok().body(result);
+        productService.decreaseStock(productStockDecreaseRequestDTO);
+        return ResponseEntity.ok().body(
+                ResponseDTO.builder()
+                        .code(BaseEnum.Success.getCode())
+                        .message(BaseEnum.Success.getDescription())
+                        .build()
+        );
     }
 }
