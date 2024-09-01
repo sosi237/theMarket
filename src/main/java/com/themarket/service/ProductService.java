@@ -2,9 +2,7 @@ package com.themarket.service;
 
 import com.themarket.dto.ProductResponseDTO;
 import com.themarket.dto.ProductStockDecreaseRequestDTO;
-import com.themarket.dto.ResponseDTO;
 import com.themarket.entity.Product;
-import com.themarket.enums.BaseEnum;
 import com.themarket.exception.ResourceNotFoundException;
 import com.themarket.exception.ValidationException;
 import com.themarket.repository.ProductRepository;
@@ -16,10 +14,10 @@ import org.springframework.util.StringUtils;
 
 import java.util.Optional;
 
+@Transactional
 @Slf4j
 @RequiredArgsConstructor
 @Service
-@Transactional
 public class ProductService {
     private final ProductRepository productRepository;
 
@@ -50,16 +48,15 @@ public class ProductService {
             throw new ValidationException("상품번호 혹은 차감개수가 잘못되었습니다.");
         }
 
-        Optional<Product> optionalProduct = productRepository.findById(prdNo);
+        // 비관적 락 사용
+        Optional<Product> optionalProduct = productRepository.findByIdForUpdate(prdNo);
         if (optionalProduct.isEmpty()) {
             throw new ResourceNotFoundException("해당 상품번호와 일치하는 정보가 없습니다: " + prdNo);
         }
 
         Product product = optionalProduct.get();
 
-        boolean hasEnoughStock = this.hasEnoughStock(prdNo, decreaseQty);
-
-        if (!hasEnoughStock) {
+        if (product.getPrdStock() < decreaseQty) {
             throw new ValidationException("재고가 부족합니다. 차감할 수 없습니다: " + prdNo);
         }
 
@@ -70,15 +67,4 @@ public class ProductService {
 
     }
 
-    public boolean hasEnoughStock(String prdNo, int quantity) {
-
-        Optional<Product> optionalProduct = productRepository.findById(prdNo);
-        if (optionalProduct.isEmpty()) {
-            throw new ResourceNotFoundException("해당 상품번호와 일치하는 정보가 없습니다: " + prdNo);
-        }
-
-        Product product = optionalProduct.get();
-
-        return product.getPrdStock() >= quantity;
-    }
 }

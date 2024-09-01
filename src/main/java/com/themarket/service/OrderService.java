@@ -29,18 +29,6 @@ public class OrderService {
 
     public ResponseDTO createOrder(OrderRequestDTO orderRequestDTO) {
 
-        for (OrderRequestDTO.OrderProduct orderProduct : orderRequestDTO.getOrderProducts()) {
-            String prdNo = orderProduct.getPrdNo();
-
-            // 상품재고확인
-            boolean hasEnoughStock = productService.hasEnoughStock(prdNo, orderProduct.getOrdQty());
-
-            if (!hasEnoughStock) {
-                throw new ValidationException("재고가 부족합니다. 차감할 수 없습니다: " + prdNo);
-            }
-
-        }
-
         // 주문정보 생성
         Order order = orderRepository.save(
                 Order.builder()
@@ -53,6 +41,12 @@ public class OrderService {
         long ordPrdTurn = 1;
         for (OrderRequestDTO.OrderProduct orderProduct : orderRequestDTO.getOrderProducts()) {
             String prdNo = orderProduct.getPrdNo();
+
+            // 재고차감
+            productService.decreaseStock(ProductStockDecreaseRequestDTO.builder()
+                    .prdNo(prdNo)
+                    .decreaseQty(orderProduct.getOrdQty())
+                    .build());
 
             ProductResponseDTO productResponseDTO = productService.findProduct(prdNo);
 
@@ -69,12 +63,6 @@ public class OrderService {
                             .ordPrdQty(orderProduct.getOrdQty())
                             .build()
             );
-
-            // 재고차감
-            productService.decreaseStock(ProductStockDecreaseRequestDTO.builder()
-                    .prdNo(prdNo)
-                    .decreaseQty(orderProduct.getOrdQty())
-                    .build());
         }
 
         return ResponseDTO.builder()
