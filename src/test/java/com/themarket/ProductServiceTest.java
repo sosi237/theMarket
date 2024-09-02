@@ -17,6 +17,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 
@@ -81,6 +82,7 @@ class ProductServiceTest {
         String prdNm = "스팸";
         int prdPrc = 10000;
         int prdStock = 500;
+        int decreaseQty = 10;
 
         Product product = Product.builder()
                 .prdNo(prdNo)
@@ -89,17 +91,19 @@ class ProductServiceTest {
                 .prdStock(prdStock)
                 .build();
 
-        when(productRepository.findById(prdNo)).thenReturn(Optional.of(product));
+        Product savedProduct = product.toBuilder().prdStock(prdStock - decreaseQty).build();
+
+        when(productRepository.findByIdForUpdate(prdNo)).thenReturn(Optional.of(product));
+        when(productRepository.save(any(Product.class))).thenReturn(savedProduct);
 
         // when
         productService.decreaseStock(ProductStockDecreaseRequestDTO.builder()
                 .prdNo(prdNo)
-                .decreaseQty(10)
+                .decreaseQty(decreaseQty)
                 .build());
 
-        // then
-//        assertNotNull(responseDTO);
-//        assertEquals(BaseEnum.Success.getCode(), responseDTO.getCode());
+        // Then
+        assertEquals(prdStock - decreaseQty, savedProduct.getPrdStock(), "재고가 예상한 만큼 차감되지 않았습니다.");
     }
 
     @DisplayName("상품 재고차감 실패: prdNo 없음")
@@ -144,12 +148,12 @@ class ProductServiceTest {
                 .prdStock(prdStock)
                 .build();
 
-        when(productRepository.findById(prdNo)).thenReturn(Optional.of(product));
+        when(productRepository.findByIdForUpdate(prdNo)).thenReturn(Optional.of(product));
 
         ValidationException exception = assertThrows(ValidationException.class,
                 () -> productService.decreaseStock(ProductStockDecreaseRequestDTO.builder()
-                                .prdNo(prdNo)
-                                .decreaseQty(1000)
+                        .prdNo(prdNo)
+                        .decreaseQty(1000)
                         .build()));
         assertEquals("재고가 부족합니다. 차감할 수 없습니다: " + prdNo, exception.getMessage());
     }
