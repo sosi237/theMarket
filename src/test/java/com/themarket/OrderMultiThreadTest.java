@@ -3,7 +3,6 @@ package com.themarket;
 import com.themarket.dto.OrderRequestDTO;
 import com.themarket.entity.Product;
 import com.themarket.exception.ResourceNotFoundException;
-import com.themarket.repository.OrderProductRepository;
 import com.themarket.repository.OrderRepository;
 import com.themarket.repository.ProductRepository;
 import com.themarket.service.OrderService;
@@ -32,10 +31,7 @@ public class OrderMultiThreadTest {
     @Autowired
     private OrderRepository orderRepository;
 
-    @Autowired
-    private OrderProductRepository orderProductRepository;
-
-     private ExecutorService executorService;
+    private ExecutorService executorService;
 
     // 10개의 스레드가 동시에 주문 요청을 보냄
     int numberOfThreads = 10;
