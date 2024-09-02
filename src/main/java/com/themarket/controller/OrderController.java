@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-@Tag(name = "상품 API", description = "상품 관련 API")
+@Tag(name = "주문 API", description = "주문 관련 API")
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/orders")
