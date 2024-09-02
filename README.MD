@@ -1,4 +1,4 @@
-# 온라인 쇼핑몰 상품 재고차감 API
+# 온라인 쇼핑몰 상품 재고 차감 API
 
 ## 기술 스택
 - Java 17
@@ -21,8 +21,14 @@
 - URL : http://localhost:8080/theMarket/swagger-ui/index.html
 
 ### 3. 동시성 테스트 
-주문 API의 동시성 문제를 해결하기 위해 상품재고차감 로직에 비관적 락을 사용했습니다.
+주문 API의 동시성 문제를 해결하기 위해 상품 재고 차감 로직에 비관적 락을 사용했습니다.
 OrderMultiThreadTest.java에서 멀티스레드 환경에서의 동작을 검증할 수 있습니다.
+
+### 4. H2 데이터베이스 접속
+애플리케이션 실행 후 H2 데이터베이스 콘솔을 통해 DB 상태를 확인할 수 있습니다.
+- URL : http://localhost:8080/h2-console
+- JDBC URL : 'jdbc:h2:mem:test'
+- username: 'sa'
 
 ## 주요 기능
 - **상품 정보 조회**

@@ -35,7 +35,7 @@ class ProductServiceTest {
     public void findProductSuccess() {
         // Given
         String prdNo = "PD240831001";
-        String prdNm = "스팸";
+        String prdNm = "SPAM";
         int prdPrc = 10000;
         int prdStock = 500;
 
@@ -79,7 +79,7 @@ class ProductServiceTest {
     public void decreaseStockSuccess() {
         // given
         String prdNo = "PD240831001";
-        String prdNm = "스팸";
+        String prdNm = "SPAM";
         int prdPrc = 10000;
         int prdStock = 500;
         int decreaseQty = 10;
@@ -137,7 +137,7 @@ class ProductServiceTest {
     @Test
     public void decreaseStockFail_notEnoughStock() {
         String prdNo = "PD240831001";
-        String prdNm = "스팸";
+        String prdNm = "SPAM";
         int prdPrc = 10000;
         int prdStock = 500;
 

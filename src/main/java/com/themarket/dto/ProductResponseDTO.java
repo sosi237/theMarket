@@ -17,7 +17,7 @@ public class ProductResponseDTO {
     @Schema(description = "상품번호", example = "PD240831001")
     private String prdNo;
 
-    @Schema(description = "상품명", example = "스팸")
+    @Schema(description = "상품명", example = "SPAM")
     private String prdNm;
 
     @Schema(description = "상품가격", example = "10000")
