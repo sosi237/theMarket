@@ -20,7 +20,7 @@ public class OrderController {
 
     private final OrderService orderService;
 
-    @Operation(summary = "주문 처리", description = "주문을 처리하며 상품재고를 차감한다")
+    @Operation(summary = "주문 생성", description = "여러 상품에 대해 주문을 생성하고, 각 상품의 재고를 차감한다")
     @PostMapping
     public ResponseEntity<ResponseDTO> createOrder(@RequestBody OrderRequestDTO orderRequestDTO) {
         ResponseDTO result = orderService.createOrder(orderRequestDTO);

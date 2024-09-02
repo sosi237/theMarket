@@ -19,14 +19,14 @@ public class ProductController {
 
     private final ProductService productService;
 
-    @Operation(summary = "상품정보 조회", description = "상품정보를 조회한다")
+    @Operation(summary = "상품정보 조회", description = "특정 상품의 재고를 포함한 상세 정보를 조회한다")
     @GetMapping(value = "/{prdNo}")
     public ResponseEntity<ProductResponseDTO> findProduct(@PathVariable String prdNo) {
         ProductResponseDTO result = productService.findProduct(prdNo);
         return ResponseEntity.ok().body(result);
     }
 
-    @Operation(summary = "상품 재고차감", description = "상품재고를 차감한다")
+    @Operation(summary = "상품 재고차감", description = "특정 상품의 재고를 차감한다")
     @PostMapping(value = "/stock/decrease")
     public ResponseEntity<ResponseDTO> decreaseStock(@RequestBody ProductStockDecreaseRequestDTO productStockDecreaseRequestDTO) {
         productService.decreaseStock(productStockDecreaseRequestDTO);

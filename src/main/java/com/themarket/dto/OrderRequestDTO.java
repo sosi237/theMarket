@@ -13,7 +13,7 @@ import java.util.List;
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 @SuperBuilder(toBuilder = true)
-@Schema(title = "주문 DTO")
+@Schema(title = "주문생성 DTO")
 public class OrderRequestDTO {
 
 
