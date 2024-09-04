@@ -86,11 +86,13 @@ public class OrderMultiThreadTest {
         // 주문 처리 후 재고 확인
         Product updatedProduct = productRepository.findById(prdNo).orElseThrow(() -> new ResourceNotFoundException("상품이 존재하지 않습니다."));
         int expectedStock = initialStock - numberOfThreads * ordQty;
+        System.out.println("주문 후 재고(예상 400): " + updatedProduct.getPrdStock());
 
         assertEquals(expectedStock, updatedProduct.getPrdStock(), "재고가 예상한 만큼 차감되지 않았습니다.");
 
         // 추가로 주문이 10개 생성되었는지 확인
         long orderCount = orderRepository.count();
+        System.out.println("생성된 주문 개수(예상 10): " + orderCount);
         assertEquals(numberOfThreads, orderCount, "주문 개수가 예상된 수와 일치하지 않습니다.");
 
     }
